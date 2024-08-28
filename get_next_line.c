@@ -6,7 +6,7 @@
 /*   By: tfelguei <tfelguei.students.42porto.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/26 17:30:20 by tfelguei          #+#    #+#             */
-/*   Updated: 2024/08/28 17:36:48 by tfelguei         ###   ########.fr       */
+/*   Updated: 2024/08/28 20:12:07 by tfelguei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,15 @@ static char	*make_line(char *stash)
 
 	if (!stash)
 		return (NULL);
+	if (!*stash)
+		return (free_data(NULL, stash));
 	if (!ft_strchr(stash, '\n'))
 		size = ft_strlen(stash);
 	else
 		size = ft_strlen(stash) - ft_strlen(ft_strchr(stash, '\n') + 1);
 	line = (char *)malloc((size + 1) * sizeof(char));
 	if (!line)
-		return (free_data(NULL, stash)); // Free stash if malloc fails
+		return (free_data(NULL, stash));
 	ft_strlcpy(line, stash, size + 1);
 	return (line);
 }
@@ -106,9 +108,9 @@ char	*get_next_line(int fd)
 		return (NULL);
 	line = make_line(stash);
 	if (!line)
-		return (free_data(NULL, stash));	
+		return (NULL);
 	stash = new_stash(stash);
-	if (!stash)
+	if (!stash && !line)
 		return (free_data(NULL, line));
 	return (line);
 }

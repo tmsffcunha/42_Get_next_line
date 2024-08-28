@@ -6,7 +6,7 @@
 /*   By: tfelguei <tfelguei.students.42porto.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/27 17:50:47 by tfelguei          #+#    #+#             */
-/*   Updated: 2024/08/28 17:31:03 by tfelguei         ###   ########.fr       */
+/*   Updated: 2024/08/28 20:17:33 by tfelguei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ char	*ft_strjoinx(char *s1, const char *s2)
 
 	len1 = 0;
 	len2 = 0;
+	if (!*s1 && !*s2)
+		return (NULL);
 	if (s1)
 		len1 = ft_strlen(s1);
 	if (s2)
@@ -31,7 +33,7 @@ char	*ft_strjoinx(char *s1, const char *s2)
 		ft_strlcpy(new, s1, len1 + 1);
 	if (s2)
 		ft_strlcpy(new + len1, s2, len2 + 1);
-	return(new);
+	return (new);
 }
 
 char	*ft_strchr(char *s, int c)
