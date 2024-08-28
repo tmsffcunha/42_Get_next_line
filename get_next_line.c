@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: tfelguei <tfelguei.students.42porto.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/26 18:29:16 by tfelguei          #+#    #+#             */
-/*   Updated: 2024/07/17 19:43:08 by tfelguei         ###   ########.fr       */
+/*   Created: 2024/08/26 17:30:20 by tfelguei          #+#    #+#             */
+/*   Updated: 2024/08/28 17:36:48 by tfelguei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,15 @@
 char	*free_data(char *buf, char *stash)
 {
 	if (buf)
+	{
 		free(buf);
+		buf = NULL;
+	}
 	if (stash)
+	{
 		free(stash);
+		stash = NULL;
+	}
 	return (NULL);
 }
 
@@ -33,6 +39,7 @@ static char	*new_stash(char *stash)
 	if (!new_stash)
 		return (free_data(NULL, stash));
 	free(stash);
+	stash = NULL;
 	return (new_stash);
 }
 
@@ -43,15 +50,13 @@ static char	*make_line(char *stash)
 
 	if (!stash)
 		return (NULL);
-	if (!*stash)
-		return (free_data(NULL, stash));
 	if (!ft_strchr(stash, '\n'))
 		size = ft_strlen(stash);
 	else
 		size = ft_strlen(stash) - ft_strlen(ft_strchr(stash, '\n') + 1);
 	line = (char *)malloc((size + 1) * sizeof(char));
 	if (!line)
-		return (free_data(NULL, stash));
+		return (free_data(NULL, stash)); // Free stash if malloc fails
 	ft_strlcpy(line, stash, size + 1);
 	return (line);
 }
@@ -59,19 +64,22 @@ static char	*make_line(char *stash)
 static char	*read_add(int fd, char *stash)
 {
 	char	*buffer;
+	char	*new_stash;
 	int		read_size;
 
-	read_size = 1;
 	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buffer)
-		return (NULL);
-	*buffer = 0;
-	while (!ft_strchr(buffer, '\n') && read_size != 0)
+		return (free_data(NULL, stash));
+	read_size = 1;
+	while (!ft_strchr(stash, '\n') && read_size != 0)
 	{
 		read_size = read(fd, buffer, BUFFER_SIZE);
 		if (read_size < 0)
 			return (free_data(buffer, stash));
-		stash = ft_strjoinx(stash, buffer);
+		buffer[read_size] = '\0';
+		new_stash = ft_strjoinx(stash, buffer);
+		free(stash);
+		stash = new_stash;
 		if (!stash)
 			return (free_data(buffer, NULL));
 	}
@@ -88,14 +96,19 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (!stash)
 	{
-		stash = NULL;
 		stash = (char *)malloc(sizeof(char));
 		if (!stash)
 			return (NULL);
 		*stash = 0;
 	}
 	stash = read_add(fd, stash);
+	if (!stash)
+		return (NULL);
 	line = make_line(stash);
+	if (!line)
+		return (free_data(NULL, stash));	
 	stash = new_stash(stash);
+	if (!stash)
+		return (free_data(NULL, line));
 	return (line);
 }
