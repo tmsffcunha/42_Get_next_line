@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tfelguei <tfelguei.students.42porto.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/26 17:30:20 by tfelguei          #+#    #+#             */
-/*   Updated: 2024/08/29 20:16:59 by tfelguei         ###   ########.fr       */
+/*   Created: 2024/08/29 20:06:06 by tfelguei          #+#    #+#             */
+/*   Updated: 2024/08/29 20:15:55 by tfelguei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,26 +91,27 @@ static char	*read_add(int fd, char *stash)
 
 char	*get_next_line(int fd)
 {
-	static char	*stash;
+	static char	*stash[1024];
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (!stash)
+	if (!stash[fd])
 	{
-		stash = (char *)malloc(sizeof(char));
-		if (!stash)
+		stash[fd] = NULL;
+		stash[fd] = (char *)malloc(sizeof(char));
+		if (!stash[fd])
 			return (NULL);
-		*stash = 0;
+		*stash[fd] = 0;
 	}
-	stash = read_add(fd, stash);
-	if (!stash)
+	stash[fd] = read_add(fd, stash[fd]);
+	if (!stash[fd])
 		return (NULL);
-	line = make_line(stash);
+	line = make_line(stash[fd]);
 	if (!line)
 		return (NULL);
-	stash = new_stash(stash);
-	if (!stash && !line)
+	stash[fd] = new_stash(stash[fd]);
+	if (!stash[fd] && !line)
 		return (free_data(NULL, line));
 	return (line);
 }
